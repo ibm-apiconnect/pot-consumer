@@ -6,13 +6,11 @@ var UrlPattern = require('url-pattern');
 var oauth = require('../../server/js/oauth.js');
 var config = require('config');
 
-var session;
 var api_url = new UrlPattern('(:host)(:api)(:operation)');
 var _apis = config.get('APIs');
 
 /* Handle the GET request for obtaining item information and render the page */
 router.get('/:id', function (req, res) {
-  session = req.session;
 
   setGetItemOptions(req, res)
     .then(sendItemReq)
@@ -24,7 +22,6 @@ router.get('/:id', function (req, res) {
 
 /* Handle the POST request for creating a new item review */
 router.post('/submitReview', function (req, res) {
-  session = req.session;
 
   setNewReviewOptions(req, res)
     .then(submitNewReview)
@@ -37,7 +34,7 @@ function setGetItemOptions(req, res) {
   var params = req.params;
 
   var item_url = api_url.stringify({
-    host: session.config.apic_uri,
+    host: req.cookies.config.apic_uri,
     api: _apis.inventory.base_path,
     operation: "/items/" + params.id
   });
@@ -49,11 +46,11 @@ function setGetItemOptions(req, res) {
     headers: {}
   };
 
-  if (_apis.inventory.require.indexOf("client_id") != -1) getItem_options.headers["X-IBM-Client-Id"] = session.config.client_id;
-  if (_apis.inventory.require.indexOf("client_secret") != -1) getItem_options.headers["X-IBM-Client-Secret"] = session.config.client_secret;
+  if (_apis.inventory.require.indexOf("client_id") != -1) getItem_options.headers["X-IBM-Client-Id"] = req.cookies.config.client_id;
+  if (_apis.inventory.require.indexOf("client_secret") != -1) getItem_options.headers["X-IBM-Client-Secret"] = req.cookies.config.client_secret;
 
   var reviews_url = api_url.stringify({
-    host: session.config.apic_uri,
+    host: req.cookies.config.apic_uri,
     api: _apis.inventory.base_path,
     operation: "/items/" + params.id + "/reviews"
   });
@@ -65,8 +62,8 @@ function setGetItemOptions(req, res) {
     headers: {}
   };
 
-  if (_apis.inventory.require.indexOf("client_id") != -1) getItemReviews_options.headers["X-IBM-Client-Id"] = session.config.client_id;
-  if (_apis.inventory.require.indexOf("client_secret") != -1) getItemReviews_options.headers["X-IBM-Client-Secret"] = session.config.client_secret;
+  if (_apis.inventory.require.indexOf("client_id") != -1) getItemReviews_options.headers["X-IBM-Client-Id"] = req.cookies.config.client_id;
+  if (_apis.inventory.require.indexOf("client_secret") != -1) getItemReviews_options.headers["X-IBM-Client-Secret"] = req.cookies.config.client_secret;
 
   return new Promise(function (fulfill) {
     
@@ -74,9 +71,9 @@ function setGetItemOptions(req, res) {
     if (_apis.inventory.require.indexOf("oauth") != -1) {
 
       // If already logged in, add token to request
-      if (typeof session.oauth2token !== 'undefined') {
-        getItem_options.headers.Authorization = 'Bearer ' + session.oauth2token;
-        getItemReviews_options.headers.Authorization = 'Bearer ' + session.oauth2token;
+      if (typeof req.cookies.oauth2token !== 'undefined') {
+        getItem_options.headers.Authorization = 'Bearer ' + req.cookies.oauth2token;
+        getItemReviews_options.headers.Authorization = 'Bearer ' + req.cookies.oauth2token;
         fulfill({
           getItem_options: getItem_options,
           getItemReviews_options: getItemReviews_options,
@@ -111,7 +108,7 @@ function setNewReviewOptions(req, res) {
   if (form_body.comment !== '') reqBody.comment = form_body.comment;
 
   var reviews_url = api_url.stringify({
-    host: session.config.apic_uri,
+    host: req.cookies.config.apic_uri,
     api: _apis.inventory.base_path,
     operation: "/items/" + form_body.itemId + "/reviews"
   });
@@ -125,16 +122,16 @@ function setNewReviewOptions(req, res) {
     JSON: true
   };
 
-  if (_apis.inventory.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = session.config.client_id;
-  if (_apis.inventory.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = session.config.client_secret;
+  if (_apis.inventory.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = req.cookies.config.client_id;
+  if (_apis.inventory.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = req.cookies.config.client_secret;
 
   return new Promise(function (fulfill) {
     // Get OAuth Access Token, if needed
     if (_apis.inventory.require.indexOf("oauth") != -1) {
 
       // If already logged in, add token to request
-      if (typeof session.oauth2token !== 'undefined') {
-        options.headers.Authorization = 'Bearer ' + session.oauth2token;
+      if (typeof req.cookies.oauth2token !== 'undefined') {
+        options.headers.Authorization = 'Bearer ' + req.cookies.oauth2token;
         fulfill({
           options: options,
           item_id: form_body.itemId,

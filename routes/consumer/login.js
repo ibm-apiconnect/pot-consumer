@@ -3,11 +3,8 @@ var router = express.Router();
 var Promise = require('promise');
 var oauth = require('../../server/js/oauth.js');
 
-var session;
-
 /* GET request for login screen */
 router.get('/', function (req, res) {
-  session = req.session;
 
   // render the login page
   res.render('login', {
@@ -18,7 +15,6 @@ router.get('/', function (req, res) {
 
 /* PROCESS POST request for login */
 router.post('/', function (req, res) {
-  session = req.session;
 
   loginWithOAuth(req, res)
     .then(renderPage)
@@ -33,16 +29,15 @@ function loginWithOAuth(req, res) {
   var password = form_body.password;
 
   return new Promise(function (fulfill) {
-    oauth.login(username, password, session)
-      .then(function () {
+    oauth.login(username, password, req.cookies.config, req.cookies.oauth2token)
+      .then(function (token) {
+        res.cookie('oauth2token', token);
         fulfill(res);
       })
       .done();
   });
 
 }
-
-//TODO: format the other pages with login / logout link
 
 function renderPage(res) {
   // Redirect to the inventory view

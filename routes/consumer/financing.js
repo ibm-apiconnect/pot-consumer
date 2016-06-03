@@ -6,13 +6,11 @@ var UrlPattern = require('url-pattern');
 var oauth = require('../../server/js/oauth.js');
 var config = require('config');
 
-var session;
 var api_url = new UrlPattern('(:host)(:api)(:operation)');
 var _apis = config.get('APIs');
 
 /* Handle the request for calculating shipping cost */
 router.get('/calculate/:item_price', function (req, res) {
-  session = req.session;
 
   setFinancingReqOptions(req, res)
     .then(submitFinancingReq)
@@ -25,7 +23,7 @@ function setFinancingReqOptions(req, res) {
   var amount = req.params.item_price;
 
   var financing_url = api_url.stringify({
-    host: session.config.apic_uri,
+    host: req.cookies.config.apic_uri,
     api: _apis.financing.base_path,
     operation: "/calculate?duration=24&rate=3.9&amount=" + amount
   });
@@ -46,8 +44,8 @@ function setFinancingReqOptions(req, res) {
     headers: {}
   };
 
-  if (_apis.financing.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = session.config.client_id;
-  if (_apis.financing.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = session.config.client_secret;
+  if (_apis.financing.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = req.cookies.config.client_id;
+  if (_apis.financing.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = req.cookies.config.client_secret;
 
   return new Promise(function (fulfill) {
     
@@ -55,8 +53,8 @@ function setFinancingReqOptions(req, res) {
     if (_apis.financing.require.indexOf("oauth") != -1) {
 
       // If already logged in, add token to request
-      if (typeof session.oauth2token !== 'undefined') {
-        options.headers.Authorization = 'Bearer ' + session.oauth2token;
+      if (typeof req.cookies.oauth2token !== 'undefined') {
+        options.headers.Authorization = 'Bearer ' + req.cookies.oauth2token;
         fulfill({
           options: options,
           res: res

@@ -6,13 +6,11 @@ var UrlPattern = require('url-pattern');
 var oauth = require('../../server/js/oauth.js');
 var config = require('config');
 
-var session;
 var api_url = new UrlPattern('(:host)(:api)(:operation)');
 var _apis = config.get('APIs');
 
 /* Handle the request for calculating shipping cost */
 router.get('/shipping/:zip', function (req, res) {
-  session = req.session;
 
   setShipCalcOptions(req, res)
     .then(submitCalcShipReq)
@@ -23,7 +21,6 @@ router.get('/shipping/:zip', function (req, res) {
 
 /* Handle the request for finding nearest store */
 router.get('/stores/:zip', function (req, res) {
-  session = req.session;
 
   setStoreLocOptions(req, res)
     .then(submitStoreLocReq)
@@ -36,7 +33,7 @@ function setShipCalcOptions(req, res) {
   var zip_code = req.params.zip;
 
   var shipping_url = api_url.stringify({
-    host: session.config.apic_uri,
+    host: req.cookies.config.apic_uri,
     api: _apis.logistics.base_path,
     operation: "/shipping?zip=" + zip_code
   });
@@ -57,8 +54,8 @@ function setShipCalcOptions(req, res) {
     headers: {}
   };
 
-  if (_apis.logistics.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = session.config.client_id;
-  if (_apis.logistics.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = session.config.client_secret;
+  if (_apis.logistics.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = req.cookies.config.client_id;
+  if (_apis.logistics.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = req.cookies.config.client_secret;
 
   return new Promise(function (fulfill) {
     
@@ -66,8 +63,8 @@ function setShipCalcOptions(req, res) {
     if (_apis.logistics.require.indexOf("oauth") != -1) {
 
       // If already logged in, add token to request
-      if (typeof session.oauth2token !== 'undefined') {
-        options.headers.Authorization = 'Bearer ' + session.oauth2token;
+      if (typeof req.cookies.oauth2token !== 'undefined') {
+        options.headers.Authorization = 'Bearer ' + req.cookies.oauth2token;
         fulfill({
           options: options,
           res: res
@@ -103,7 +100,7 @@ function setStoreLocOptions(req, res) {
   var zip_code = req.params.zip;
 
   var stores_url = api_url.stringify({
-    host: session.config.apic_uri,
+    host: req.cookies.config.apic_uri,
     api: _apis.logistics.base_path,
     operation: "/stores?zip=" + zip_code
   });
@@ -124,8 +121,8 @@ function setStoreLocOptions(req, res) {
     headers: {}
   };
 
-  if (_apis.logistics.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = session.config.client_id;
-  if (_apis.logistics.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = session.config.client_secret;
+  if (_apis.logistics.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = req.cookies.config.client_id;
+  if (_apis.logistics.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = req.cookies.config.client_secret;
 
   return new Promise(function (fulfill) {
 
@@ -133,8 +130,8 @@ function setStoreLocOptions(req, res) {
     if (_apis.logistics.require.indexOf("oauth") != -1) {
 
       // If already logged in, add token to request
-      if (typeof session.oauth2token !== 'undefined') {
-        options.headers.Authorization = 'Bearer ' + session.oauth2token;
+      if (typeof req.cookies.oauth2token !== 'undefined') {
+        options.headers.Authorization = 'Bearer ' + req.cookies.oauth2token;
         fulfill({
           options: options,
           res: res

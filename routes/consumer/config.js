@@ -1,13 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var UrlPattern = require('url-pattern');
-var session;
 
 /* GET config page. */
 router.get('/', function (req, res) {
-  session = req.session;
-  console.log("SESSION (get config): " + JSON.stringify(session));
-  
   var default_host = (process.env.NODE_ENV == 'bluemix') ? "https://api.us.apiconnect.ibmcloud.com" : "https://api.think.ibm";
   var default_org = (process.env.NODE_ENV == 'bluemix') ? "YOUR BLUEMIX ORG" : "sales";
 
@@ -20,9 +16,6 @@ router.get('/', function (req, res) {
 
 /* POST config setup */
 router.post('/', function (req, res) {
-  session = req.session;
-  console.log("SESSION: (post config 1) " + JSON.stringify(session));
-  
   var form_body = req.body;
   var apic_uri_pattern = new UrlPattern('(:host)(/:org)(/:cat)');
   var apic_uri = apic_uri_pattern.stringify({
@@ -30,15 +23,14 @@ router.post('/', function (req, res) {
     org: form_body['apic-org'],
     cat: form_body['apic-catalog']
   });
-  
-  session.config = {
+
+  var config = {
     'client_id': form_body['client-id'],
     'client_secret': form_body['client-secret'],
     'apic_uri': apic_uri
   };
-
-  console.log("SESSION: (post config 2) " + JSON.stringify(session));
   
+  res.cookie('config', config);
   res.redirect('/');
 });
 

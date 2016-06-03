@@ -6,15 +6,13 @@ var UrlPattern = require('url-pattern');
 var oauth = require('../../server/js/oauth.js');
 var config = require('config');
 
-var session, page_filter;
+var page_filter;
 var api_url = new UrlPattern('(:host)(:api)(:operation)');
 var _apis = config.get('APIs');
 
 /* GET inventory listing and render the page */
 router.get('/', function (req, res) {
-  session = req.session;
-  console.log("SESSION (inventory): " + JSON.stringify(session));
-
+  
   page_filter = (typeof req.query.filter !== 'undefined') ? JSON.stringify(req.query.filter.order) : false;
 
   setGetItemsOptions(req, res)
@@ -29,7 +27,7 @@ function setGetItemsOptions(req, res) {
   var query = req.query;
   
   var items_url = api_url.stringify({
-    host: session.config.apic_uri,
+    host: req.cookies.config.apic_uri,
     api: _apis.inventory.base_path,
     operation: "/items"
   });
@@ -41,8 +39,8 @@ function setGetItemsOptions(req, res) {
     headers: {}
   };
   
-  if (_apis.inventory.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = session.config.client_id;
-  if (_apis.inventory.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = session.config.client_secret;
+  if (_apis.inventory.require.indexOf("client_id") != -1) options.headers["X-IBM-Client-Id"] = req.cookies.config.client_id;
+  if (_apis.inventory.require.indexOf("client_secret") != -1) options.headers["X-IBM-Client-Secret"] = req.cookies.config.client_secret;
 
   // Apply the query filter, if one is present
   if (typeof query.filter !== 'undefined') options.url += '?filter=' + JSON.stringify(query.filter);
@@ -54,8 +52,8 @@ function setGetItemsOptions(req, res) {
     if (_apis.inventory.require.indexOf("oauth") != -1) {
 
       // If already logged in, add token to request
-      if (typeof session.oauth2token !== 'undefined') {
-        options.headers.Authorization = 'Bearer ' + session.oauth2token;
+      if (typeof req.cookies.oauth2token !== 'undefined') {
+        options.headers.Authorization = 'Bearer ' + req.cookies.oauth2token;
         fulfill({
           options: options,
           res: res
