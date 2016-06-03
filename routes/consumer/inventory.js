@@ -13,6 +13,7 @@ var _apis = config.get('APIs');
 /* GET inventory listing and render the page */
 router.get('/', function (req, res) {
   session = req.session;
+  console.log("SESSION (inventory): " + JSON.stringify(session));
 
   page_filter = (typeof req.query.filter !== 'undefined') ? JSON.stringify(req.query.filter.order) : false;
 
