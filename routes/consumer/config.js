@@ -5,6 +5,9 @@ var session;
 
 /* GET config page. */
 router.get('/', function (req, res) {
+  session = req.session;
+  console.log("SESSION: " + JSON.stringify(session));
+  
   var default_host = (process.env.NODE_ENV == 'bluemix') ? "https://api.us.apiconnect.ibmcloud.com" : "https://api.think.ibm";
   var default_org = (process.env.NODE_ENV == 'bluemix') ? "YOUR BLUEMIX ORG" : "sales";
 
@@ -18,6 +21,8 @@ router.get('/', function (req, res) {
 /* POST config setup */
 router.post('/', function (req, res) {
   session = req.session;
+  console.log("SESSION: " + JSON.stringify(session));
+  
   var form_body = req.body;
   var apic_uri_pattern = new UrlPattern('(:host)(/:org)(/:cat)');
   var apic_uri = apic_uri_pattern.stringify({

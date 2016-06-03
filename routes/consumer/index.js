@@ -5,6 +5,7 @@ var session;
 /* GET home page. */
 router.get('/', function (req, res) {
   session = req.session;
+  console.log("SESSION: " + JSON.stringify(session));
 
   if (typeof session.config !== 'undefined') {
     res.render('index', {title: 'ThinkIBM Consumer'});
