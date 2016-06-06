@@ -6,8 +6,7 @@
 var open = require('open');
 var app = require('../app');
 var debug = require('debug')('consumer:server');
-var https = require('https');
-var fs = require('fs');
+var http = require('http');
 
 /**
  * Get port from environment and store in Express.
@@ -20,11 +19,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var serverOptions = {
-  key: fs.readFileSync('./bin/certs/key.pem'),
-  cert: fs.readFileSync('./bin/certs/cert.pem')
-};
-var server = https.createServer(serverOptions, app);
+var server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -96,7 +91,7 @@ function onListening() {
   if (process.env.NODE_ENV != 'bluemix') {
     // open the browser and navigate to the home page
     var isLinux = /^linux/.test(process.platform);
-    if (isLinux) open('https://127.0.0.1:' + addr.port, "google-chrome");
-    else open('https://127.0.0.1:' + addr.port);
+    if (isLinux) open('http://127.0.0.1:' + addr.port, "google-chrome");
+    else open('http://127.0.0.1:' + addr.port);
   }
 }
