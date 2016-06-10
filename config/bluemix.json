@@ -21,7 +21,7 @@
       ]
     },
     "oauth20": {
-      "base_path": "/oauth20",
+      "base_path": "/oauth2",
       "paths": {
         "authz": "/authorize",
         "token": "/token"
