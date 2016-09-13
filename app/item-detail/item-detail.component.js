@@ -117,12 +117,7 @@ angular
             })
             .$promise
             .then(function (result) {
-              var soapEnv = result['soapenv:Envelope'];
-              var soapBody = soapEnv['soapenv:Body'];
-              var financingResult = soapBody['ser:financingResult'];
-              var paymentAmount = financingResult['ser:paymentAmount'].$;
-
-              $scope.financingResult = paymentAmount;
+              $scope.financingResult = result.paymentAmount;
             });
         };
 
