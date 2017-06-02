@@ -8,7 +8,7 @@ angular
       return {
         Item: function (options) {
           return $resource(
-            options.urlBase + '/inventory/items/:id',
+            options.urlBase + '/api/Items/:id',
             {id: '@id'},
             {
               'get': {
@@ -24,7 +24,7 @@ angular
         },
         Review: function (options) {
           return $resource(
-            options.urlBase + '/inventory/items/:id/reviews',
+            options.urlBase + '/api/Items/:id/reviews',
             {id: '@id'},
             {
               'save': {

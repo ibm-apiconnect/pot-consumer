@@ -10,7 +10,7 @@ angular
         /* View Vars */
 
         $scope.item = {};     // loaded from the getItem function
-        $scope.reviews = [];  // loaded from the getReviews function
+        //$scope.reviews = [];  // loaded from the getReviews function
 
         $scope.financingResult = "undefined";
         $scope.shippingResult = "undefined";
@@ -57,45 +57,48 @@ angular
             .$promise
             .then(function(item) {
               $scope.item = item;
-            });
 
-        }
-
-        function getReviews () {
-
-          var options = {
-            urlBase: localStorageService.get("urlBase"),
-            headers: {
-              'X-IBM-Client-Id': localStorageService.get("clientId"),
-              'X-IBM-Client-Secret': localStorageService.get("clientSecret"),
-              'Authorization': "Bearer " + localStorageService.get("accessToken")
-            }
-          };
-
-          Think
-            .Review(options)
-            .query({
-              id: $routeParams.itemId
-            })
-            .$promise
-            .then(function(reviews) {
-              /* Clean up the date format for display */
-  
-              reviews.forEach(function (item, index) {
-                console.log("index: " + JSON.stringify(index));
-                console.log("item: " + JSON.stringify(item));
-                var startTimeISOString = item.date;
-                var d = new Date(startTimeISOString);
-                d = new Date( d.getTime() + ( d.getTimezoneOffset() * 60000 ) ).toDateString().replace("00:00:00 GMT-0600 (CST)","");
-                item.date = d;
-              });
-
-              $scope.reviews = reviews;
-
+              // This is only necessary because the reviews portion got nixed... if that's added back in, remove the next line
               stopSpin();
             });
 
         }
+
+        // function getReviews () {
+        //
+        //   var options = {
+        //     urlBase: localStorageService.get("urlBase"),
+        //     headers: {
+        //       'X-IBM-Client-Id': localStorageService.get("clientId"),
+        //       'X-IBM-Client-Secret': localStorageService.get("clientSecret"),
+        //       'Authorization': "Bearer " + localStorageService.get("accessToken")
+        //     }
+        //   };
+        //
+        //   Think
+        //     .Review(options)
+        //     .query({
+        //       id: $routeParams.itemId
+        //     })
+        //     .$promise
+        //     .then(function(reviews) {
+        //       /* Clean up the date format for display */
+        //
+        //       reviews.forEach(function (item, index) {
+        //         console.log("index: " + JSON.stringify(index));
+        //         console.log("item: " + JSON.stringify(item));
+        //         var startTimeISOString = item.date;
+        //         var d = new Date(startTimeISOString);
+        //         d = new Date( d.getTime() + ( d.getTimezoneOffset() * 60000 ) ).toDateString().replace("00:00:00 GMT-0600 (CST)","");
+        //         item.date = d;
+        //       });
+        //
+        //       $scope.reviews = reviews;
+        //
+        //       stopSpin();
+        //     });
+        //
+        // }
 
         $scope.finCalc = function () {
 
@@ -225,7 +228,7 @@ angular
         if (configured() && authenticated()) {
           startSpin(true);
           getItem();
-          getReviews();
+          //getReviews();
           $rootScope.logInOutLink = "#!/logout";
           $rootScope.logInOutText = "Log Out";
         } else if (configured()) {
