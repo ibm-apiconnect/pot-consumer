@@ -18,13 +18,7 @@ angular
         console.log("init clientId value: " + localStorageService.get("clientId"));
         console.log("init clientSecret value: " + localStorageService.get("clientSecret"));
         console.log("init accessToken value: " + localStorageService.get("accessToken"));
-  
-        /* Pre-Set Form Values */
-        // $scope.config = {
-        //   clientId: "de0a1f1a-16c0-47ff-b99b-cec5dbc7f9a8",
-        //   clientSecret: "fV6rO0fI6bF4aO8fM8oS3tO8cR1dG1gC7jQ4aY5jO5lI1hK1mX",
-        //   apiEndpoint: "https://api.us.apiconnect.ibmcloud.com/apic-services-api-connect-pot/sb"
-        // };
+
         $scope.config = {
           clientId: "< YOUR CLIENT ID >",
           clientSecret: "< YOUR CLIENT SECRET >",
